@@ -1,4 +1,3 @@
-#include <utility>
 /*
 Вариант 6
 Предметная область  Агентство новостей
@@ -9,6 +8,9 @@
  */
 
 #include <iostream>
+#include <vector>
+#include <string>
+#include "HashTable.h"
 
 using namespace std;
 
@@ -46,25 +48,9 @@ private:
     static int MAX_ID;
 };
 
-/// Hasher ///
-
-class Hash {
-    static int universalHash(int a, int b, int p, int m, int x) {
-        int hash = ((a * x + b) % p) % m;
-        return hash;
-    }
-};
-
-template<typename T>
-class HashTable {
-    HashTable<T>(const T[]);
-
-    bool exists(const T &val);
-
-
-};
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    HashTable ht({"Vogue", "New York Times", "Forbes", "Special"});
+    cout << ht.exists("Vogue") << " " << ht.exists("Fox");
     return 0;
 }
