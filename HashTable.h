@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <ctime>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -17,8 +18,8 @@ public:
     HashTable(const vector<string> &_values) {
         srand(time(NULL));
         prime = HashTable::nextPrime(_values.size() + 1);
-        hashTable.resize(prime+1);
-        vector<vector<string> > tmpVec(prime+1);
+        hashTable.resize(prime + 1);
+        vector<vector<string> > tmpVec(prime + 1);
         a = HashTable::nextPrime(rand() % 10000 + 3);
         for (auto &val:_values) {
             tmpVec[firstHash(val)].push_back(val);
@@ -47,7 +48,7 @@ private:
         unsigned int hash = 0;
         int ml = a;
         for (char ch:str) {
-            hash += (ch * ml) % prime;
+            hash = (hash + ch * ml) % prime;
             ml *= a;
         }
         return hash;
@@ -61,6 +62,9 @@ private:
         }
 
         void fill(const vector<string> _values) {
+            if (_values.empty())
+                return;
+
             srand(time(NULL));
             m = _values.size() * _values.size();
             values.resize(m, "");
@@ -74,6 +78,7 @@ private:
                         filled = true;
                     else {
                         filled = false;
+                        std::cout << "damn\n";
                         break;
                     }
                 }
@@ -85,7 +90,7 @@ private:
             unsigned int hash = 0;
             int ml = mult;
             for (char ch:str) {
-                hash += (ch * (ml + 1)) % prime;
+                hash = (hash + ch * (ml + 1)) % prime;
                 ml *= mult;
             }
             return hash;
@@ -99,7 +104,7 @@ private:
 
         bool addValue(const string &val) {
             unsigned int tmp = Node::secondHash(val, a, m);
-            if (values[tmp].empty())
+            if (!values[tmp].empty())
                 return false;
             else
                 values[tmp] = val;
