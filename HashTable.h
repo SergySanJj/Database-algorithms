@@ -27,6 +27,8 @@ public:
     }
 };
 
+
+
 class HashTable {
 public:
     HashTable(const vector<string> &_values) {
@@ -73,22 +75,13 @@ private:
     static unsigned int nextPrime(unsigned int val);
 
     unsigned int firstHash(const string &str) const {
-        /*unsigned int hash = 0;
-        int ml = a;
-        for (char ch:str) {
-            hash = (hash + ch * ml + b) % prime;
-            ml *= a;
-        }
-        return hash;*/
         return size_t((a * hash<string>()(str) + b) % prime);
     }
 
 
     class Node {
     public:
-        Node() {
-
-        }
+        Node() {}
 
         bool fill(const vector<string> _values) {
             if (_values.empty())
@@ -127,13 +120,6 @@ private:
         }
 
         static unsigned int secondHash(const string &str, unsigned int mult, unsigned int adder, unsigned int prime) {
-            /*unsigned int hash = 0;
-            int ml = mult;
-            for (char ch:str) {
-                hash = (hash + ch * ml + adder) % prime;
-                ml *= mult;
-            }
-            return hash;*/
             return size_t((mult * hash<string>()(str) + adder) % prime);
         }
 
