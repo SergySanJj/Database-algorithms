@@ -11,57 +11,28 @@
 #include <string>
 #include <iostream>
 
+#include "HashTable.h"
+#include "Agency.h"
+
 using namespace std;
 
-class Statistics {
+class HashTableNews {
 public:
-    static int elements;
-    static unsigned long totalHashChange;
-    static int totalBuckets;
-    static int totalBucketElements;
-    static int maxBucket;
-    static int mas[500];
-
-    static void printStat() {
-        cout << "Total elements - " << elements << "\n";
-        cout << "Total Hash Changes - " << totalHashChange << "\n";
-        cout << "Max bucket size - " << maxBucket << endl;
-        cout << "dist: " << endl;
-        for (int i=0;i<maxBucket+1;i++)
-        {
-            cout << "(" << i << ", "  << mas[i] << ") ";
-        }
-    }
-
-    static void clear()
-    {
-        elements = 0;
-        totalHashChange = 0;
-        totalBuckets = 0;
-        totalBucketElements = 0;
-        maxBucket = -1;
-    }
-};
-
-
-class HashTable {
-public:
-    HashTable(const vector<string> &_values) {
+    HashTableNews(const vector<News> &_values) {
         Statistics::elements = _values.size();
-        capacity = _values.size()+1;
 
         srand(time(NULL));
-        prime = HashTable::nextPrime(_values.size() + 1);
+        prime = HashTableNews::nextPrime(_values.size() + 1);
         bool finished = false;
         while (!finished) {
 
             hashTable.clear();
             hashTable.resize(prime + 1);
-            vector<vector<string> > tmpVec(prime + 1);
-            a = rand() % 10000 + 3;
-            b = rand() % 10000 + 3;
+            vector<vector<News> > tmpVec(prime + 1);
+            a = rand() % 10001 + 3;
+            b = rand() % 10001 + 3;
             for (auto &val:_values) {
-                tmpVec[firstHash(val)].push_back(val);
+                tmpVec[firstHash(val.getTitle())].push_back(val);
                 Statistics::totalBucketElements++;
             }
             for (int i = 0; i < prime; i++) {
@@ -75,26 +46,7 @@ public:
         }
     }
 
-    ~HashTable() = default;
-
-    void findStatistics()
-    {
-        int maxBucket = -1;
-        for (int i=0;i<hashTable.size();i++)
-        {
-
-            if (maxBucket<hashTable[i].getBucketSize())
-            {
-                maxBucket = hashTable[i].getBucketSize();
-            }
-        }
-        Statistics::maxBucket = maxBucket;
-        for (int i=0;i<hashTable.size();i++)
-        {
-            Statistics::mas[hashTable[i].getBucketSize()]++;
-        }
-
-    }
+    ~HashTableNews() = default;
 
     bool exists(const string &val) {
         unsigned int fHash = firstHash(val);
@@ -111,7 +63,7 @@ private:
     static unsigned int nextPrime(unsigned int val);
 
     unsigned int firstHash(const string &str) const {
-        return size_t(((a * hash<string>()(str) + b) % prime)%capacity);
+        return size_t((a * hash<string>()(str) + b) % prime);
     }
 
 
@@ -119,9 +71,7 @@ private:
     public:
         Node() {}
 
-        int getBucketSize() const { return values.size(); }
-
-        bool fill(const vector<string> _values) {
+        bool fill(const vector<News> _values) {
             if (_values.empty())
                 return true;
             else
@@ -131,14 +81,14 @@ private:
             int lim = _values.size() * 100;
 
             srand(time(NULL));
-            m = HashTable::nextPrime(_values.size() * _values.size());
-            values.resize(m, "");
+            m = HashTableNews::nextPrime(_values.size() * _values.size());
+            values.resize(m);
             bool filled = false;
             while (!filled) {
-                a = rand() % 10000 + 3;
-                b = rand() % 10000 + 3;
+                a = rand() % 10001 + 3;
+                b = rand() % 10001 + 3;
                 for (auto &str:values)
-                    str = "";
+                    str = News();
                 for (auto &val:_values) {
                     if (addValue(val))
                         filled = true;
@@ -167,9 +117,9 @@ private:
 
         bool isReady() const { return ready; }
 
-        bool addValue(const string &val) {
-            unsigned int tmp = Node::secondHash(val, a, b, m);
-            if (!values[tmp].empty())
+        bool addValue(const News &val) {
+            unsigned int tmp = Node::secondHash(val.getTitle(), a, b, m);
+            if (!values[tmp].getTitle().empty())
                 return false;
             else {
                 values[tmp] = val;
@@ -179,8 +129,12 @@ private:
 
         bool exists(const string &val) {
             unsigned int sHash = Node::secondHash(val, a, b, m);
-            if (!values[sHash].empty()) {
-                return (values[sHash] == val);
+            if (!values[sHash].getTitle().empty()) {
+                if (values[sHash].getTitle() == val) {
+                    values[sHash].print();
+                    return true;
+                }
+                return false;
             } else
                 return false;
         }
@@ -188,10 +142,10 @@ private:
     private:
         unsigned int a, b, m;
         bool ready = false;
-        vector<string> values;
+        vector<News> values;
     };
 
     vector<Node> hashTable;
-    unsigned int a, b, prime, capacity;
+    unsigned int a, b, prime;
 };
 

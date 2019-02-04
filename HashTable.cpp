@@ -4,7 +4,6 @@
 
 #include "HashTable.h"
 
-
 bool HashTable::isPrime(unsigned int val) {
     if (val == 1 || val == 2 || val == 3)
         return true;
@@ -27,3 +26,5 @@ unsigned long Statistics::totalHashChange = 0;
 int Statistics::totalBuckets = 0;
 int Statistics::totalBucketElements = 0;
 int Statistics::elements = 0;
+int Statistics::maxBucket = 0;
+int Statistics::mas[500] = {};

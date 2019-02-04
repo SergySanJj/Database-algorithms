@@ -13,42 +13,11 @@
 #include <random>
 
 #include "HashTable.h"
+#include "HashTableNews.h"
+#include "Agency.h"
 
 using namespace std;
 
-class Agency {
-public:
-    Agency(std::string _name) :
-            name(std::move(_name)) {}
-
-private:
-    std::string name;
-};
-
-class News {
-    News(std::string _title, std::string _text, int _Id) :
-            title(std::move(_title)), text(std::move(_text)), categoryId(_Id) {}
-
-private:
-    std::string title;
-    std::string text;
-    int categoryId;
-};
-
-class Category {
-    Category(const std::string &_name) : name(_name) {
-        id = MAX_ID;
-        MAX_ID++;
-    }
-
-    std::string getName() { return name; }
-
-private:
-    int id;
-    std::string name;
-
-    static int MAX_ID;
-};
 
 bool checkExistance(const string &s, const vector<string> vec) {
     for (auto &str:vec) {
@@ -62,7 +31,7 @@ bool checkExistance(const string &s, const vector<string> vec) {
 std::string randomString(std::string::size_type length) {
     static auto &chrs = "0123456789"
                         "abcdefghijklmnopqrstuvwxyz"
-                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ       ";
 
     thread_local static std::mt19937 rg{std::random_device{}()};
     thread_local static std::uniform_int_distribution<std::string::size_type> pick(0, sizeof(chrs) - 2);
@@ -92,12 +61,36 @@ vector<string> randomStrings(std::size_t cnt, int maxLen) {
     return res;
 }
 
+vector<News> randomNews(std::size_t cnt, int maxLenName, int maxLenText)
+{
+    srand(time(NULL));
+    vector<News> res;
+    auto names = randomStrings(cnt,maxLenName);
+    auto texts = randomStrings(cnt,maxLenText);
+    for (int i=0;i<cnt;i++)
+    {
+        News news(names[i],texts[i],i);
+        res.push_back(news);
+    }
+    return res;
+}
+
 int main() {
     //HashTable ht({"Vogue", "New York Times", "Forbes", "Special"});
-    auto generated = randomStrings(3000, 100);
-    HashTable ht(generated);
-    cout << ht.exists(generated[1]) << endl;
+    auto generated = randomStrings(10000, 100);
+    auto rndNews = randomNews(300,30,200);
 
+
+    HashTable ht(generated);
+    cout << ht.exists(generated[1]) << " " << ht.exists("---") << endl;
+    ht.findStatistics();
     Statistics::printStat();
+    //cout << "\n\n NEWS \n\n";
+
+    //Statistics::clear();
+
+    //HashTableNews newsTable(rndNews);
+    //cout << newsTable.exists(rndNews[1].getTitle()) << " " << newsTable.exists("---") << endl;
+    //Statistics::printStat();
     return 0;
 }
