@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <random>
+
 #include "HashTable.h"
 
 using namespace std;
@@ -48,9 +50,54 @@ private:
     static int MAX_ID;
 };
 
+bool checkExistance(const string &s, const vector<string> vec) {
+    for (auto &str:vec) {
+        if (s == str)
+            return true;
+    }
+    return
+            false;
+}
+
+std::string randomString(std::string::size_type length) {
+    static auto &chrs = "0123456789"
+                        "abcdefghijklmnopqrstuvwxyz"
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    thread_local static std::mt19937 rg{std::random_device{}()};
+    thread_local static std::uniform_int_distribution<std::string::size_type> pick(0, sizeof(chrs) - 2);
+
+    std::string s;
+
+    s.reserve(length);
+
+    while (length--)
+        s += chrs[pick(rg)];
+
+    return s;
+}
+
+vector<string> randomStrings(std::size_t cnt, int maxLen) {
+    srand(time(NULL));
+    vector<string> res(cnt, "");
+
+    for (int i = 0; i < res.size(); i++) {
+        string newS;
+        while (checkExistance(newS, res)) {
+            int len = rand() % maxLen + 1;
+            newS = randomString(len);
+        }
+        res[i] = newS;
+    }
+    return res;
+}
 
 int main() {
-    HashTable ht({"Vogue", "New York Times", "Forbes", "Special"});
-    cout << ht.exists("Vogue") << " " << ht.exists("Fox");
+    //HashTable ht({"Vogue", "New York Times", "Forbes", "Special"});
+    auto generated = randomStrings(3000, 100);
+    HashTable ht(generated);
+    cout << ht.exists(generated[1]) << endl;
+
+    Statistics::printStat();
     return 0;
 }

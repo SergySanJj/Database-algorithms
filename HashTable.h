@@ -13,19 +13,47 @@
 
 using namespace std;
 
+class Statistics {
+public:
+    static int elements;
+    static unsigned long totalHashChange;
+    static int totalBuckets;
+    static int totalBucketElements;
+
+    static void printStat() {
+        cout << "Total elements - " << elements << "\n";
+        cout << "Total Hash Changes - " << totalHashChange << "\n";
+        cout << "Avg bucket size  - " << totalBucketElements / (double) totalBuckets << endl;
+    }
+};
+
 class HashTable {
 public:
     HashTable(const vector<string> &_values) {
+        Statistics::elements = _values.size();
+
         srand(time(NULL));
         prime = HashTable::nextPrime(_values.size() + 1);
-        hashTable.resize(prime + 1);
-        vector<vector<string> > tmpVec(prime + 1);
-        a = HashTable::nextPrime(rand() % 10000 + 3);
-        for (auto &val:_values) {
-            tmpVec[firstHash(val)].push_back(val);
-        }
-        for (int i = 0; i < prime; i++) {
-            hashTable[i].fill(tmpVec[i]);
+        bool finished = false;
+        while (!finished) {
+
+            hashTable.clear();
+            hashTable.resize(prime + 1);
+            vector<vector<string> > tmpVec(prime + 1);
+            a = rand() % 10000 + 3;
+            b = rand() % 10000 + 3;
+            for (auto &val:_values) {
+                tmpVec[firstHash(val)].push_back(val);
+                Statistics::totalBucketElements++;
+            }
+            for (int i = 0; i < prime; i++) {
+                if (!hashTable[i].fill(tmpVec[i])) {
+                    finished = false;
+                    //cout << "FIRST\n";
+                    break;
+                }
+                finished = true;
+            }
         }
     }
 
@@ -45,13 +73,14 @@ private:
     static unsigned int nextPrime(unsigned int val);
 
     unsigned int firstHash(const string &str) const {
-        unsigned int hash = 0;
+        /*unsigned int hash = 0;
         int ml = a;
         for (char ch:str) {
-            hash = (hash + ch * ml) % prime;
+            hash = (hash + ch * ml + b) % prime;
             ml *= a;
         }
-        return hash;
+        return hash;*/
+        return size_t((a * hash<string>()(str) + b) % prime);
     }
 
 
@@ -61,16 +90,22 @@ private:
 
         }
 
-        void fill(const vector<string> _values) {
+        bool fill(const vector<string> _values) {
             if (_values.empty())
-                return;
+                return true;
+            else
+                Statistics::totalBuckets++;
+
+            int cntTry = 0;
+            int lim = _values.size() * 100;
 
             srand(time(NULL));
-            m = _values.size() * _values.size();
+            m = HashTable::nextPrime(_values.size() * _values.size());
             values.resize(m, "");
             bool filled = false;
             while (!filled) {
-                a = HashTable::nextPrime(rand() % 10000 + 3);
+                a = rand() % 10000 + 3;
+                b = rand() % 10000 + 3;
                 for (auto &str:values)
                     str = "";
                 for (auto &val:_values) {
@@ -78,22 +113,28 @@ private:
                         filled = true;
                     else {
                         filled = false;
-                        std::cout << "damn\n";
+                        cntTry++;
+                        Statistics::totalHashChange++;
+                        //std::cout << _values.size() << " second\n" ;
                         break;
                     }
                 }
+                if (cntTry > lim)
+                    return false;
             }
             ready = true;
+            return true;
         }
 
-        static unsigned int secondHash(const string &str, unsigned int mult, unsigned int prime) {
-            unsigned int hash = 0;
+        static unsigned int secondHash(const string &str, unsigned int mult, unsigned int adder, unsigned int prime) {
+            /*unsigned int hash = 0;
             int ml = mult;
             for (char ch:str) {
-                hash = (hash + ch * (ml + 1)) % prime;
+                hash = (hash + ch * ml + adder) % prime;
                 ml *= mult;
             }
-            return hash;
+            return hash;*/
+            return size_t((mult * hash<string>()(str) + adder) % prime);
         }
 
         unsigned int getMult() const { return a; }
@@ -103,25 +144,30 @@ private:
         bool isReady() const { return ready; }
 
         bool addValue(const string &val) {
-            unsigned int tmp = Node::secondHash(val, a, m);
+            unsigned int tmp = Node::secondHash(val, a, b, m);
             if (!values[tmp].empty())
                 return false;
-            else
+            else {
                 values[tmp] = val;
+            }
             return true;
         }
 
         bool exists(const string &val) {
-            return (!values[Node::secondHash(val, a, m)].empty());
+            unsigned int sHash = Node::secondHash(val, a, b, m);
+            if (!values[sHash].empty()) {
+                return (values[sHash] == val);
+            } else
+                return false;
         }
 
     private:
-        unsigned int a, m;
+        unsigned int a, b, m;
         bool ready = false;
         vector<string> values;
     };
 
     vector<Node> hashTable;
-    unsigned int a, prime;
+    unsigned int a, b, prime;
 };
 

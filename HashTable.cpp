@@ -22,3 +22,8 @@ unsigned int HashTable::nextPrime(unsigned int val) {
         i++;
     return i;
 }
+
+unsigned long Statistics::totalHashChange = 0;
+int Statistics::totalBuckets = 0;
+int Statistics::totalBucketElements = 0;
+int Statistics::elements = 0;
