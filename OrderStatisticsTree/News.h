@@ -34,7 +34,7 @@ public:
         fout << title << "\n" << text << '\n' << categoryId << '\n' << agencyId << '\n' << views << '\n';
     }
 
-    static int cmpVIEVS(News &a, News &b) {
+    static int cmpVIEWS(News &a, News &b) {
         if (a.views == b.views)
             return 1;
         return (a.views < b.views) ? 0 : 2;

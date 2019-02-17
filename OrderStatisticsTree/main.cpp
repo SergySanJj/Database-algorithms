@@ -24,19 +24,21 @@ void testINT() {
 }
 
 void testNEWS() {
-    //generateNewsFile(10);
+    //generateNewsFile(100);
     auto news = getNewsFromFile("news.txt");
     OrderStatisticsTree<News> t([](News &a, News &b) {
-        return News::cmpVIEVS(a, b);
+        return News::cmpVIEWS(a, b);
     });
-
     for (auto &n:news) {
         t.insert(n);
     }
+    /*
     for (int i = 1; i <= t.getSize(); i++) {
         t.orderStatistic(i).print();
         std::cout << std::endl;
     }
+     */
+    t.orderStatistic(10).print();
 }
 
 int main() {

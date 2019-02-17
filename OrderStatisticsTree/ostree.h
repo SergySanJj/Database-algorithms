@@ -32,7 +32,7 @@ private:
     Node<T> *right = nullptr;
     Node<T> *parent = nullptr;
     Color color = red; // true - red, false - black
-    unsigned int size;
+    unsigned int size = 1;
 };
 
 
