@@ -24,7 +24,7 @@ void testINT() {
 }
 
 void testNEWS() {
-    //generateNewsFile(1000);
+    //generateNewsFile(10);
     auto news = getNewsFromFile("news.txt");
     OrderStatisticsTree<News> t([](News &a, News &b) {
         return News::cmpVIEVS(a, b);
@@ -33,8 +33,10 @@ void testNEWS() {
     for (auto &n:news) {
         t.insert(n);
     }
-
-    t.orderStatistic(8).print();
+    for (int i = 1; i <= t.getSize(); i++) {
+        t.orderStatistic(i).print();
+        std::cout << std::endl;
+    }
 }
 
 int main() {

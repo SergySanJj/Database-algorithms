@@ -79,6 +79,8 @@ public:
         return (a < b) ? 0 : 2;
     }
 
+    unsigned int getSize() const { return size; }
+
 private:
     Node<T> *NIL = Node<T>::createNIL();
 
@@ -197,10 +199,9 @@ private:
         parent = nullptr;
         while (current != NIL) {
             current->size++;
-            if (cmp(data, current->data) == 1)
-                return (current);
             parent = current;
-            current = (cmp(data, current->data) == 0) ?
+            int tmp = cmp(data, current->data);
+            current = (tmp == 0 || tmp == 1) ?
                       current->left : current->right;
         }
 
@@ -212,15 +213,16 @@ private:
         x->color = red;
 
         if (parent) {
-            if (cmp(data, parent->data) == 0)
+            int tmp = cmp(data, parent->data);
+            if (tmp == 0 || tmp == 1)
                 parent->left = x;
             else
                 parent->right = x;
         } else {
             Root = x;
         }
-
         insertFixup(x);
+
         return (x);
     }
 
