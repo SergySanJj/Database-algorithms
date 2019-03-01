@@ -32,12 +32,12 @@ void testNEWS() {
     for (auto &n:news) {
         t.insert(n);
     }
-    /*
+/*
     for (int i = 1; i <= t.getSize(); i++) {
         t.orderStatistic(i).print();
         std::cout << std::endl;
-    }
-     */
+    }*/
+
     t.orderStatistic(10).print();
 }
 
