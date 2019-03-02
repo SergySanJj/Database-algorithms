@@ -2,26 +2,29 @@
 
 using namespace std;
 
-template<typename DAT>
+template<typename KEY, class DAT>
 class Node {
 public:
-    Node(const DAT &_data) : data(_data) {}
+    Node(const KEY &_key, const DAT &_data) : key(_key), data(_data) {}
 
-    Node<DAT> *left, *right, *parent = nullptr;
+    Node<KEY, DAT> *left= nullptr;
+    Node<KEY, DAT> *right = nullptr;
+    Node<KEY, DAT> *parent = nullptr;
+
     DAT data;
+    KEY key;
 };
 
-template<typename T>
+template<typename KEY, class DAT>
 class SplayTree {
 public:
-    SplayTree() = delete;
+    SplayTree() = default;
 
-    template<typename F>
-    explicit SplayTree(F _cmp) : cmp(_cmp) {}
+    ~SplayTree() {
+        del(Root);
+    }
 
-    ~SplayTree() = default;
-
-    void splay(Node<T> *x) {
+    void splay(Node<KEY, DAT> *x) {
         while (x->parent) {
             if (!x->parent->parent) {
                 if (x->parent->left == x)
@@ -44,18 +47,16 @@ public:
         }
     }
 
-    void insert(const T &val) {
+    void insert(const KEY &key, const DAT &dat) {
         // binary insert
-        auto x = new Node<T>(val);
+        auto x = new Node<DAT, KEY>(key, dat);
 
-        Node<T> *prev = nullptr;
+        Node<DAT, KEY> *prev = nullptr;
         auto curr = Root;
         while (curr != nullptr) {
             prev = curr;
-            int compare = cmp(curr->data, val);
-            if (compare == -1 || compare == 0)
+            if (key <= curr->key)
                 curr = curr->left;
-
             else
                 curr = curr->right;
         }
@@ -63,8 +64,7 @@ public:
             Root = x;
         else {
             x->parent = prev;
-            int compare = cmp(prev->data, val);
-            if (compare == -1 || compare == 0)
+            if (key <= prev->key)
                 prev->left = x;
             else
                 prev->right = x;
@@ -73,19 +73,18 @@ public:
         splay(x);
     }
 
-    bool exists(const T &val) {
+    bool exists(const KEY &key) {
         auto curr = Root;
         auto prev = Root;
         while (curr != nullptr) {
             prev = curr;
-            int compare = cmp(curr->data, val);
-            if (compare == -1 || compare == 0)
+            if (key <= curr->key)
                 curr = curr->left;
 
             else
                 curr = curr->right;
         }
-        if (cmp(prev->data, val) == 0)
+        if (prev->key == key)
             return true;
         else
             return false;
@@ -93,13 +92,19 @@ public:
     }
 
 private:
+    Node<KEY, DAT> *Root = nullptr;
 
-    int (*cmp)(const T &, const T &);
+    void del(Node<DAT, KEY> *curr) {
+        if (curr == nullptr)
+            return;
+        del(curr->left);
+        del(curr->right);
 
-    Node<T> *Root = nullptr;
+        delete curr;
+    }
 
-    void rotateLeft(Node<T> *x) {
-        Node<T> *y = x->right;
+    void rotateLeft(Node<DAT, KEY> *x) {
+        Node<DAT, KEY> *y = x->right;
         if (y) {
             x->right = y->left;
             if (y->left) y->left->parent = x;
@@ -113,8 +118,8 @@ private:
         x->parent = y;
     }
 
-    void rotateRight(Node<T> *x) {
-        Node<T> *y = x->left;
+    void rotateRight(Node<DAT, KEY> *x) {
+        Node<DAT, KEY> *y = x->left;
         if (y) {
             x->left = y->right;
             if (y->right) y->right->parent = x;
@@ -131,9 +136,9 @@ private:
 };
 
 int main() {
-    auto t = SplayTree<int>([](const int &a, const int &b) { return ((a < b) ? -1 : ((a > b) ? 1 : 0)); });
+    auto t = SplayTree<int, int>();
     for (int i = 0; i < 10; i++)
-        t.insert(i);
+        t.insert(i, i);
     std::cout << t.exists(9) << " " << t.exists(111);
     return 0;
 }
