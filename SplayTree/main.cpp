@@ -7,7 +7,7 @@ class Node {
 public:
     Node(const KEY &_key, const DAT &_data) : key(_key), data(_data) {}
 
-    Node<KEY, DAT> *left= nullptr;
+    Node<KEY, DAT> *left = nullptr;
     Node<KEY, DAT> *right = nullptr;
     Node<KEY, DAT> *parent = nullptr;
 
