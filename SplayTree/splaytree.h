@@ -115,6 +115,45 @@ public:
             return DAT();
     }
 
+    DAT findUpdate(const KEY &key){
+        auto curr = Root;
+        while (curr != nullptr) {
+            if (curr->key == key)
+                break;
+
+            if (key < curr->key)
+                curr = curr->left;
+            else
+                curr = curr->right;
+        }
+        if (curr == nullptr)
+            return DAT();
+        if (curr->key == key) {
+            splay(curr);
+            return curr->data;
+        }
+        else
+            return DAT();
+    }
+
+    int elemHeight(const KEY &key) const{
+        int height = 0;
+        auto curr = Root;
+        while (curr != nullptr) {
+            if (curr->key == key)
+                break;
+
+            if (key < curr->key)
+                curr = curr->left;
+            else
+                curr = curr->right;
+            height++;
+        }
+        if (curr == nullptr)
+            return -1;
+        return ((curr->key == key)?height:(-1));
+    }
+
     int height() const {
         return findHeight(Root);
     }

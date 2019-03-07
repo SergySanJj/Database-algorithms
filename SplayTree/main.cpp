@@ -10,17 +10,31 @@ using namespace std;
 using Random = effolkronium::random_static;
 
 
+void searchTest(int index, std::vector<News> &v, SplayTree<std::string, News> &t) {
+    if (index >= v.size())
+        return;
+
+    std::cout << "Search for " << index << " element with title: " << v[index].getTitle() << "\n";
+    std::cout << "Element: \n";
+    t.find(v[index].getTitle()).print();
+    std::cout << "Element height before update: " << t.elemHeight(v[index].getTitle()) << "\n";
+    t.findUpdate(v[index].getTitle());
+    std::cout << "Element height after update: " << t.elemHeight(v[index].getTitle()) << "\n";
+}
+
 void testNEWS() {
-    generateNewsFile(1000);
+    //generateNewsFile(1000);
     auto news = getNewsFromFile("news.txt");
     SplayTree<std::string, News> t;
     for (auto &n:news) {
         t.insert(n.getTitle(), n);
     }
-    auto testNews = news[0];
+    int id;
+    std::cout << "Find news with id: ";
+    std::cin >> id;
+    searchTest(id, news, t);
 
-    t.find(testNews.getTitle()).print();
-    std::cout << "Max Height: " << t.height() << std::endl;
+    std::cout << "\nMax Height: " << t.height() << std::endl;
     std::cout << "Avg Height: " << t.avgHeight() << std::endl;
 }
 
@@ -56,6 +70,6 @@ void statINT(int cnt) {
 int main() {
     //testNEWS();
     //testINT(1000, 0, 1);
-    //statINT(1000);
+    statINT(1000);
     return 0;
 }
