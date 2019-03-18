@@ -109,7 +109,21 @@ public:
     }
 
     void printTree(int ident = 0) {
-        postorder(Root, ident);
+        //postorder(Root, ident);
+        displayNodeFancy(Root,2);
+    }
+
+    void displayNodeFancy(Node<KEY,DAT>* node, int tabs) {
+        if (node->right != NULL)
+            displayNodeFancy(node->right, tabs + 4);
+        else cout << endl;
+        for (int i = 0; i < tabs; i++)
+            cout << " ";
+        cout << node->key<< " - " << node->data;
+        if (node->left != NULL)
+            displayNodeFancy(node->left, tabs + 4);
+        else cout << endl;
+
     }
 
 private:
@@ -154,18 +168,6 @@ private:
         std::cout << "----------------------------------------------------------\n";
 
         return root;
-    }
-
-    void postorder(Node<KEY, DAT> *p, int indent = 0) {
-        if (p != NULL) {
-            cout << p->key << "\n ";
-            if (p->left) postorder(p->left, indent + 4);
-            if (p->right) postorder(p->right, indent + 4);
-            if (indent) {
-                std::cout << std::setw(indent) << ' ';
-            }
-
-        }
     }
 };
 
