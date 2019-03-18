@@ -39,8 +39,8 @@ template<typename KEY, typename DAT>
 class tmpNode {
 public:
     tmpNode(Node<KEY, DAT> *_node, int _begin, int _end, int _r) : node(_node), begin(_begin),
-                                                                                  end(_end),
-                                                                                  r(_r) {}
+                                                                   end(_end),
+                                                                   r(_r) {}
 
     Node<KEY, DAT> *node;
     int begin, end, r;
@@ -79,13 +79,15 @@ public:
                 continue;
             if (r > begin && r <= end) {
                 tmp_r = this->build(root, data, begin, r - 1);
-                node->left = new Node<KEY, DAT>(data[tmp_r - 1].first, data[tmp_r - 1].second);
+                node->left = new Node<KEY, DAT>(data[tmp_r - 1].first,
+                                                data[tmp_r - 1].second);
                 tmp = new tmpNode<KEY, DAT>(node->left, begin, r - 1, tmp_r);
                 S.push(tmp);
             }
             if (r >= begin && r < end) {
                 tmp_r = this->build(root, data, r + 1, end);
-                node->right = new Node<KEY, DAT>(data[tmp_r - 1].first, data[tmp_r - 1].second);
+                node->right = new Node<KEY, DAT>(data[tmp_r - 1].first,
+                                                 data[tmp_r - 1].second);
                 tmp = new tmpNode<KEY, DAT>(node->right, r + 1, end, tmp_r);
                 S.push(tmp);
             }
@@ -106,14 +108,17 @@ public:
         return false;
     }
 
-    Node<KEY,DAT>* getRoot() { return Root;}
+    void printTree(int ident = 0) {
+        postorder(Root, ident);
+    }
 
 private:
     Node<KEY, DAT> *Root;
 
-    int build(const std::vector<std::vector<int>> &_root, const std::vector<std::pair<KEY, DAT>> &data,
-                   int begin, int end) {
-        int r = _root[begin][end];
+    int build(const std::vector<std::vector<int>> &root,
+              const std::vector<std::pair<KEY, DAT>> &data,
+              int begin, int end) {
+        int r = root[begin][end];
         return r;
     }
 
@@ -151,18 +156,29 @@ private:
         return root;
     }
 
-};
+    void postorder(Node<KEY, DAT> *p, int indent = 0) {
+        if (p != NULL) {
+            cout << p->key << "\n ";
+            if (p->left) postorder(p->left, indent + 4);
+            if (p->right) postorder(p->right, indent + 4);
+            if (indent) {
+                std::cout << std::setw(indent) << ' ';
+            }
 
+        }
+    }
+};
 
 
 int main() {
     std::vector<std::pair<int, int> > v = {std::make_pair(2, 1),
                                            std::make_pair(4, 2),
-                                           std::make_pair(6, 3),
-                                           std::make_pair(8, 4)};
+                                           std::make_pair(6, 7),
+                                           std::make_pair(8, 40)};
     std::vector<double> freq = {0.1, 0.5, 0.1, 0.3};
     OptimalBST<int, int> t(v, freq);
     std::cout << "\n" << t.exists(2) << " " << t.exists(-1) << "\n";
-
+    std::cout << "----------------------------------------------------------\n";
+    t.printTree(4);
     return 0;
 }
