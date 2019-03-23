@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <stack>
+#include <queue>
 
 #include <limits.h>
 
@@ -30,6 +31,17 @@ void print(Grid &theGrid) {
     }
 }
 
+void printm(int **m, int n) {
+
+    for (int jj = 0; jj < n; ++jj) {
+        for (int ii = 0; ii < n; ++ii) {
+            std::cout << std::setprecision(2);
+            std::cout << std::setw(10) << m[jj][ii] << ' ';
+        }
+        std::cout << '\n';
+    }
+}
+
 template<typename KEY, typename DAT>
 class Node {
 public:
@@ -41,7 +53,6 @@ public:
     DAT data;
     Node *left = nullptr;
     Node *right = nullptr;
-    Node *parent = nullptr;
 };
 
 template<typename KEY, typename DAT>
@@ -62,55 +73,14 @@ public:
     OptimalBST() = delete;
 
     OptimalBST(std::vector<std::pair<KEY, DAT> > &data,
-               std::vector<double> &freq) {
-        auto root = makeMatrix(freq, data.size());
+               std::vector<int> &freq) {
+        prf.resize(MAX);
 
-        int begin = 1;
-        int end = root.size() - 1;
-        int tmp_r;
-        int r = this->build(root, data, begin, end);
+        dp.resize(MAX, std::vector<int>(MAX));
+        opt.resize(MAX, std::vector<int>(MAX));
 
-        Root = new Node<KEY, DAT>(data[r - 1].first, data[r - 1].second);
-        build_tree(1, data.size(), data, root, Root);
-
-        /*
-        int begin = 1;
-        int end = root.size() - 1;
-        int tmp_r;
-        int r = this->build(root, data, begin, end);
-
-        Root = new Node<KEY, DAT>(data[r - 1].first, data[r - 1].second);
-        Node<KEY, DAT> *node;
-        auto *tmp = new tmpNode<KEY, DAT>(Root, begin, end, r);
-
-        std::stack<tmpNode<KEY, DAT> *> S;
-        S.push(tmp);
-        while (!S.empty()) {
-            tmp = S.top();
-            S.pop();
-            node = tmp->node;
-            begin = tmp->begin;
-            end = tmp->end;
-            r = tmp->r;
-            delete tmp;
-            if (begin > end || (r <= begin && r >= end))
-                continue;
-            if (r > begin && r <= end) {
-                tmp_r = this->build(root, data, begin, r - 1);
-                node->left = new Node<KEY, DAT>(data[tmp_r - 1].first,
-                                                data[tmp_r - 1].second);
-                tmp = new tmpNode<KEY, DAT>(node->left, begin, r - 1, tmp_r);
-                S.push(tmp);
-            }
-            if (r >= begin && r < end) {
-                tmp_r = this->build(root, data, r + 1, end);
-                node->right = new Node<KEY, DAT>(data[tmp_r - 1].first,
-                                                 data[tmp_r - 1].second);
-                tmp = new tmpNode<KEY, DAT>(node->right, r + 1, end, tmp_r);
-                S.push(tmp);
-            }
-        }
-*/
+        matrix(freq, data.size());
+        build(data, data.size());
     }
 
     bool exists(KEY key) {
@@ -127,17 +97,18 @@ public:
     }
 
     void printTree(int ident = 0) {
-        //postorder(Root, ident);
         displayNodeFancy(Root, 2);
     }
 
     void displayNodeFancy(Node<KEY, DAT> *node, int tabs) {
-        if (node->right != NULL)
+        if (node == nullptr)
+            return;
+        if (node->right != nullptr)
             displayNodeFancy(node->right, tabs + 4);
         else cout << endl;
         for (int i = 0; i < tabs; i++)
             cout << " ";
-        cout << node->key;
+        cout << node->data.getTitle() << "(" << node->data.getViews() << ")";
         if (node->left != NULL)
             displayNodeFancy(node->left, tabs + 4);
         else cout << endl;
@@ -147,70 +118,91 @@ public:
 private:
     Node<KEY, DAT> *Root;
 
-    int build(const std::vector<std::vector<int>> &root,
-              const std::vector<std::pair<KEY, DAT>> &data,
-              int begin, int end) {
-        int r = root[begin][end];
-        return r;
-    }
+    const static int MAX = 10;
+    const static int INF = 1000000;
 
-    Matrix<int> makeMatrix(const std::vector<double> &freq, int n) {
-        Matrix<double> e(n + 2, std::vector<double>(n + 2, 0));
-        Matrix<double> w(n + 2, std::vector<double>(n + 2, 0));
-        Matrix<int> root(n + 1, std::vector<int>(n + 1, 0));
+    std::vector<int> prf;
+    std::vector<std::vector<int>> dp, opt;
 
-        for (std::size_t i = 1; i <= n + 1; ++i) {
-            e[i][i - 1] = freq[i - 1];
-            w[i][i - 1] = freq[i - 1];
-        }
 
-        for (std::size_t l = 1; l <= n; ++l) {
-            for (int i = 1; i <= n - l + 1; ++i) {
-                std::size_t j = i + l - 1;
-                e[i][j] = INT_MAX;
-                w[i][j] = w[i][j - 1] + freq[j];
-                for (int r = i; r <= j; ++r) {
-                    double t = e[i][r - 1] + e[r + 1][j] + w[i][j];
-                    if (t < e[i][j]) {
-                        e[i][j] = t;
-                        root[i][j] = r;
+    void matrix(const std::vector<int> &freq, int n) {
+        auto sum = [this](int l, int r) {
+            return prf[r] - prf[l - 1];
+        };
+
+        for (int i = 1; i <= n; ++i)
+            prf[i] = prf[i - 1] + freq[i - 1];
+
+        for (int len = 1; len <= n; ++len) {
+            for (int start = 1; start <= n - len + 1; ++start) {
+                int end = start + len - 1;
+                dp[start][end] = INF;
+                for (int mid = start; mid <= end; ++mid) {
+                    int upd = dp[start][mid - 1] + dp[mid + 1][end] + sum(start, mid - 1) + sum(mid + 1, end);
+                    if (upd < dp[start][end]) {
+                        dp[start][end] = min(dp[start][end], upd);
+                        opt[start][end] = mid;
                     }
                 }
             }
         }
+        print(dp);
+        std::cout << "***\n";
+        print(opt);
 
-        std::cout << "expectation: " << e[1][n] << "\n";
-        print(e);
-        std::cout << "----------------------------------------------------------\n";
-        print(root);
-        std::cout << "----------------------------------------------------------\n";
-
-        return root;
     }
 
-    void build_tree(int i, int j, std::vector<std::pair<KEY, DAT> > &input_data, const vector<vector<int>> &root,
-                    Node<KEY, DAT> *node) {
-        if (i > j) {
-            if (node->parent->left == node) {
-                node->parent->left = nullptr;
-            } else {
-                node->parent->right = nullptr;
+    void build(std::vector<std::pair<KEY, DAT> > &data, int n) {
+        cout.precision(4);
+        cout.setf(ios::fixed);
+        queue<pair<pair<int, int>, int> > que;
+        std::vector<std::pair<KEY, DAT>> res(data.size());
+        que.push({{1, n}, 0});
+        int cnt = 0;
+        while (!que.empty()) {
+            int l = que.front().first.first, r = que.front().first.second, h = que.front().second;
+            que.pop();
+            if (l <= r) {
+                int now = opt[l][r];
+                DAT item = data[now - 1].second;
+
+                cout << setw(25) << item.getTitle() << setw(7) << item.getViews()/*/sum*/ << setw(3) << h
+                     << setw(7) << item.getViews()/*/sum*/* h << setw(10) << dp[l][r] << endl;
+
+                res[cnt].first = data[now - 1].first;
+                res[cnt].second = data[now - 1].second;
+
+                que.push({{l, now - 1}, h + 1});
+                que.push({{now + 1, r}, h + 1});
+
+                cnt++;
             }
-            return;
         }
-        int cur_root = root[i][j];
+        create(res);
+    }
 
-        std::cout << input_data[cur_root].first << " ";
+    void create(std::vector<std::pair<KEY, DAT>> &data) {
+        Root = new Node<KEY, DAT>(data[0].first, data[0].second);
+        for (int i = 1; i < data.size(); i++) {
+            insertBinary(data[i]);
+        }
+    }
 
-        node->key = input_data[cur_root].first;
-        node->data = input_data[cur_root].second;
-        node->left = new Node<KEY, DAT>();
-        node->left->parent = node;
-        node->right = new Node<KEY, DAT>();
-        node->right->parent = node;
-
-        build_tree(i, cur_root - 1, input_data, root, node->left);
-        build_tree(cur_root + 1, j, input_data, root, node->right);
-
+    void insertBinary(std::pair<KEY, DAT> value) {
+        if (Root == nullptr)
+            Root = new Node<KEY, DAT>(value.first, value.second);
+        auto curr = Root;
+        auto prev = Root;
+        while (curr != nullptr) {
+            prev = curr;
+            if (value.first <= curr->key) {
+                curr = curr->left;
+            } else
+                curr = curr->right;
+        }
+        if (value.first <= prev->key)
+            prev->left = new Node<KEY, DAT>(value.first, value.second);
+        else
+            prev->right = new Node<KEY, DAT>(value.first, value.second);
     }
 };
