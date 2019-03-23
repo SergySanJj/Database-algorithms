@@ -74,6 +74,7 @@ public:
 
     OptimalBST(std::vector<std::pair<KEY, DAT> > &data,
                std::vector<int> &freq) {
+        MAX = data.size()+2;
         prf.resize(MAX);
 
         dp.resize(MAX, std::vector<int>(MAX));
@@ -118,7 +119,7 @@ public:
 private:
     Node<KEY, DAT> *Root;
 
-    const static int MAX = 10;
+    int MAX = 10;
     const static int INF = 1000000;
 
     std::vector<int> prf;
