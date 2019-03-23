@@ -69,7 +69,7 @@ void statINT(int cnt) {
 
 int main() {
     //testNEWS();
-    //testINT(1000, 0, 1);
-    statINT(1000);
+    testINT(1000, 0, 1);
+    //statINT(1000);
     return 0;
 }

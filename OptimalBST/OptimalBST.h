@@ -31,17 +31,6 @@ void print(Grid &theGrid) {
     }
 }
 
-void printm(int **m, int n) {
-
-    for (int jj = 0; jj < n; ++jj) {
-        for (int ii = 0; ii < n; ++ii) {
-            std::cout << std::setprecision(2);
-            std::cout << std::setw(10) << m[jj][ii] << ' ';
-        }
-        std::cout << '\n';
-    }
-}
-
 template<typename KEY, typename DAT>
 class Node {
 public:
@@ -74,7 +63,7 @@ public:
 
     OptimalBST(std::vector<std::pair<KEY, DAT> > &data,
                std::vector<int> &freq) {
-        MAX = data.size()+2;
+        MAX = data.size() + 2;
         prf.resize(MAX);
 
         dp.resize(MAX, std::vector<int>(MAX));
@@ -120,7 +109,7 @@ private:
     Node<KEY, DAT> *Root;
 
     int MAX = 10;
-    const static int INF = 1000000;
+    const static int INF = INT_MAX;
 
     std::vector<int> prf;
     std::vector<std::vector<int>> dp, opt;
@@ -150,7 +139,7 @@ private:
         print(dp);
         std::cout << "***\n";
         print(opt);
-
+        std::cout << "***\n";
     }
 
     void build(std::vector<std::pair<KEY, DAT> > &data, int n) {
@@ -167,8 +156,7 @@ private:
                 int now = opt[l][r];
                 DAT item = data[now - 1].second;
 
-                cout << setw(25) << item.getTitle() << setw(7) << item.getViews()/*/sum*/ << setw(3) << h
-                     << setw(7) << item.getViews()/*/sum*/* h << setw(10) << dp[l][r] << endl;
+                cout << setw(25) << item.getTitle() << setw(7) << item.getViews() << std::endl;
 
                 res[cnt].first = data[now - 1].first;
                 res[cnt].second = data[now - 1].second;
