@@ -1,34 +1,63 @@
 #include "persset.h"
+#include "generators.h"
+#include "random.hpp"
+#include "News.h"
 
 #include <queue>
 #include <iostream>
 #include <utility>
 #include <vector>
 
+using Random = effolkronium::random_static;
 
-int main() {
+void testINT() {
     RBTree<int> t([](int &a, int &b) {
         if (a == b)
             return 1;
         return (a < b) ? 0 : 2;
     });
-    t.print();
-    t.insert(8);
-    t.print();
-    t.insert(1);
-    t.print();
-    t.insert(2);
-    t.print();
-    t.insert(4);
-    t.print();
+    for (int i = 2; i < 22; i++)
+        t.insert(Random::get(1, 2000));
+}
 
-//    t.print();
-//
-//    t.resetTo(2);
-//    t.print();
-//
-//    t.resetTo(0);
-//    t.print();
+void testNEWS() {
+    generateNewsFile(10);
+    auto news = getNewsFromFile("news.txt");
+    RBTree<News> t([](News &a, News &b) {
+        return News::cmpTITLE(a, b);
+    });
+    for (auto &n:news) {
+        t.insert(n);
+    }
+
+    t.print();
+}
+
+void handTest() {
+    RBTree<int> t([](int &a, int &b) {
+        if (a == b)
+            return 1;
+        return (a < b) ? 0 : 2;
+    });
+    auto v = {6, 1, 2, 4};
+    for (auto &el:v) {
+        t.insert(el);
+        t.print();
+    }
+
+    while (true){
+        std::cout << "Go to version: ";
+        int version;
+        std::cin >> version;
+        t.resetTo(version);
+        t.print();
+    }
+}
+
+int main() {
+    handTest();
+    //testINT();
+    //testNEWS();
 
     return 0;
 }

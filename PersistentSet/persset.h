@@ -168,7 +168,6 @@ private:
                     /* uncle is black */
                     if (x == x->parent->right) {
                         /* make x a left child */
-                        // TODO
                         x = x->parent;
                         rotateLeft(x);
                     }
@@ -190,7 +189,6 @@ private:
                     x = x->parent->parent;
                 } else {
                     /* uncle is black */
-                    // TODO
                     if (x == x->parent->left) {
                         x = x->parent;
                         rotateRight(x);
