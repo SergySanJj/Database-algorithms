@@ -2,6 +2,9 @@
 // Created by Sergey on 17.02.2019.
 //
 
+#include <iostream>
+#include <vector>
+
 enum Color {
     black = false, red = true
 };
@@ -11,14 +14,14 @@ class Node {
 public:
     Node() = default;
 
-    ~Node() = default;
+    Node(Node<T> *other) : data(other->data), left(other->left), right(other->right), parent(other->parent),
+                           color(other->color) {}
 
-    Node(const Node<Key, Data> *node) : key(node->key), data(node->data), color(node->color),
-                                            left(node->left), right(node->right),
-                                            parent(node->parent) {}
+    ~Node() = default;
 
     template<typename DAT> friend
     class RBTree;
+
 private:
     static Node<T> *createNIL() {
         auto tmp = new Node<T>();
@@ -67,10 +70,36 @@ public:
 
     unsigned int getSize() const { return size; }
 
+    void print() {
+        std::cout << "Current version: " << currentVersion;
+        if (currentVersion == latestVersion)
+            std::cout << " (latest)\n";
+        else
+            std::cout << "\n";
+        displayNodeFancy(Root, 2);
+    }
+
+    void resetTo(int version) {
+        if (version >= 0 && version <= latestVersion) {
+            currentVersion = version;
+            Root = versions[version];
+        } else
+            return;
+    }
+
+    void lastVersion() {
+        currentVersion = latestVersion;
+        Root = versions[latestVersion];
+    }
+
 private:
     Node<T> *NIL = Node<T>::createNIL();
-
     Node<T> *Root = NIL;
+
+    int latestVersion = 0;
+    int currentVersion = 0;
+
+    std::vector<Node<T> *> versions = {NIL};
 
     // Function that compares 2 typename T elements with <= order
     int (*cmp)(T &, T &);
@@ -122,43 +151,52 @@ private:
         /* check red-black properties */
         while (x != Root && x->parent->color == red) {
             /* we have a violation */
-            if (x->parent == x->parent->parent->left) {
-                Node<T> *y = x->parent->parent->right;
-                if (y->color == red) {
+            if (x->parent->parent == nullptr)
+                break;
 
+            if (x->parent == x->parent->parent->left) {
+                // COPY
+                auto y = new Node<T>(x->parent->parent->right);
+                if (y != NIL)
+                    y->parent = x->parent->parent;
+                x->parent->parent->right = y;
+                //Node<T> *y = x->parent->parent->right;
+                if (y->color == red) {
                     /* uncle is red */
                     x->parent->color = black;
                     y->color = black;
                     x->parent->parent->color = red;
                     x = x->parent->parent;
                 } else {
-
                     /* uncle is black */
                     if (x == x->parent->right) {
                         /* make x a left child */
+                        // TODO
                         x = x->parent;
                         rotateLeft(x);
                     }
-
                     /* recolor and rotate */
                     x->parent->color = black;
                     x->parent->parent->color = red;
                     rotateRight(x->parent->parent);
                 }
             } else {
-
                 /* mirror image of above code */
-                Node<T> *y = x->parent->parent->left;
-                if (y->color == red) {
+                // COPY
+                auto y = new Node<T>(x->parent->parent->left);
+                if (y != NIL)
+                    y->parent = x->parent->parent;
+                x->parent->parent->left = y;
 
+                if (y->color == red) {
                     /* uncle is red */
                     x->parent->color = black;
                     y->color = black;
                     x->parent->parent->color = red;
                     x = x->parent->parent;
                 } else {
-
                     /* uncle is black */
+                    // TODO
                     if (x == x->parent->left) {
                         x = x->parent;
                         rotateRight(x);
@@ -173,15 +211,49 @@ private:
     }
 
     Node<T> *insertNode(T data) {
+        if (Root == NIL) {
+            auto x = new Node<T>();
+            x->data = data;
+            x->parent = nullptr;
+            x->left = NIL;
+            x->right = NIL;
+            x->color = red;
+            Root = x;
+
+            latestVersion++;
+            if (currentVersion != latestVersion)
+                currentVersion = latestVersion;
+
+            versions.push_back(Root);
+            return x;
+        }
+
+        auto rootCopy = new Node<T>(Root);
+
+
         Node<T> *current, *parent, *x;
 
-        current = Root;
+        current = rootCopy;
         parent = nullptr;
         while (current != NIL) {
             parent = current;
             int tmp = cmp(data, current->data);
-            current = (tmp == 0 || tmp == 1) ?
-                      current->left : current->right;
+
+            if (tmp == 0 || tmp == 1) {
+                if (current->left == NIL) break;
+
+                auto leftCopy = new Node<T>(current->left);
+                current->left = leftCopy;
+                leftCopy->parent = current;
+                current = leftCopy;
+            } else {
+                if (current->right == NIL) break;
+
+                auto rightCopy = new Node<T>(current->right);
+                rightCopy->parent = current;
+                current->right = rightCopy;
+                current = rightCopy;
+            }
         }
 
         x = new Node<T>();
@@ -200,6 +272,13 @@ private:
         } else {
             Root = x;
         }
+        versions.push_back(rootCopy);
+
+        latestVersion++;
+        if (currentVersion != latestVersion)
+            currentVersion = latestVersion;
+        Root = rootCopy;
+
         insertFixup(x);
 
         return (x);
@@ -228,5 +307,23 @@ private:
         recursiveDelete(x->left);
         recursiveDelete(x->right);
         delete x;
+    }
+
+    void displayNodeFancy(Node<T> *node, int tabs) {
+        if (node == nullptr)
+            return;
+        if (node->right != nullptr)
+            displayNodeFancy(node->right, tabs + 4);
+        else std::cout << std::endl;
+        for (int i = 0; i < tabs; i++)
+            std::cout << " ";
+        if (node == NIL)
+            std::cout << "NIL";
+        else
+            std::cout << node->data;
+        if (node->left != nullptr)
+            displayNodeFancy(node->left, tabs + 4);
+        else std::cout << std::endl;
+
     }
 };
