@@ -156,11 +156,8 @@ private:
 
             if (x->parent == x->parent->parent->left) {
                 // COPY
-                auto y = new Node<T>(x->parent->parent->right);
-                if (y != NIL)
-                    y->parent = x->parent->parent;
-                x->parent->parent->right = y;
-                //Node<T> *y = x->parent->parent->right;
+
+                Node<T> *y = x->parent->parent->right;
                 if (y->color == red) {
                     /* uncle is red */
                     x->parent->color = black;
@@ -183,10 +180,7 @@ private:
             } else {
                 /* mirror image of above code */
                 // COPY
-                auto y = new Node<T>(x->parent->parent->left);
-                if (y != NIL)
-                    y->parent = x->parent->parent;
-                x->parent->parent->left = y;
+                Node<T> *y = x->parent->parent->left;
 
                 if (y->color == red) {
                     /* uncle is red */
@@ -279,6 +273,14 @@ private:
             currentVersion = latestVersion;
         Root = rootCopy;
 
+        // Copy LR two levels up
+        if (x->parent != nullptr)
+        {
+            CopyLR(x->parent);
+            if (x->parent->parent != nullptr)
+                CopyLR(x->parent->parent);
+        }
+
         insertFixup(x);
 
         return (x);
@@ -325,5 +327,18 @@ private:
             displayNodeFancy(node->left, tabs + 4);
         else std::cout << std::endl;
 
+    }
+
+    void CopyLR(Node<T> *x) {
+        if (x->left != NIL) {
+            auto left = new Node<T>(x->left);
+            left->parent = x;
+            x->left = left;
+        }
+        if (x->right != NIL) {
+            auto right = new Node<T>(x->right);
+            right->parent = x;
+            x->right = right;
+        }
     }
 };
