@@ -272,9 +272,11 @@ private:
         Root = rootCopy;
 
         // Copy LR two levels up
-        if (x->parent != nullptr)
-        {
-            CopyLR(x->parent);
+        if (x->parent != nullptr) {
+            if (x == x->parent->left)
+                CopyR(x->parent);
+            else
+                CopyL(x->parent);
             if (x->parent->parent != nullptr)
                 CopyLR(x->parent->parent);
         }
@@ -327,16 +329,25 @@ private:
 
     }
 
-    void CopyLR(Node<T> *x) {
+    void CopyL(Node<T> *x) {
         if (x->left != NIL) {
             auto left = new Node<T>(x->left);
             left->parent = x;
             x->left = left;
         }
+    }
+
+    void CopyR(Node<T> *x) {
         if (x->right != NIL) {
             auto right = new Node<T>(x->right);
             right->parent = x;
             x->right = right;
         }
     }
+
+    void CopyLR(Node<T> *x) {
+        CopyL(x);
+        CopyR(x);
+    }
+
 };

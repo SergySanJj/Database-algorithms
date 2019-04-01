@@ -45,12 +45,15 @@ void handTest() {
         t.print();
     }
 
-    while (true){
-        std::cout << "Go to version: ";
-        int version;
-        std::cin >> version;
-        t.resetTo(version);
-        t.print();
+    if (0) {
+
+        while (true) {
+            std::cout << "Go to version: ";
+            int version;
+            std::cin >> version;
+            t.resetTo(version);
+            t.print();
+        }
     }
 }
 
