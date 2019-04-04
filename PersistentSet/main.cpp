@@ -39,7 +39,7 @@ void handTest() {
             return 1;
         return (a < b) ? 0 : 2;
     });
-    auto v = {6, 1, 2, 4};
+    auto v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     for (auto &el:v) {
         t.insert(el);
         t.print();
@@ -47,7 +47,7 @@ void handTest() {
 
     if (0) {
 
-        while (true) {
+        while (false) {
             std::cout << "Go to version: ";
             int version;
             std::cin >> version;

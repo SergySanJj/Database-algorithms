@@ -322,7 +322,7 @@ private:
         if (node == NIL)
             std::cout << "NIL";
         else
-            std::cout << node->data;
+            std::cout << node->data << " " << node->color;
         if (node->left != nullptr)
             displayNodeFancy(node->left, tabs + 4);
         else std::cout << std::endl;
