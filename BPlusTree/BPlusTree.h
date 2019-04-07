@@ -17,7 +17,7 @@ public:
     Node<KEY, DAT> *left = nullptr;
 
     std::vector<KEY> keys;
-    std::vector<DAT> data;
+    std::vector<DAT *> data;
     std::vector<Node<KEY, DAT> *> children;
 
     int keyNumber;
@@ -27,7 +27,7 @@ public:
         keyNumber = 0;
         keys.resize(2 * t);
         data.resize(2 * t);
-        children.resize(2 * t + 2);
+        children.resize(2 * t + 1);
     }
 
     int size() { return keys.size(); }
@@ -60,7 +60,7 @@ public:
         auto leaf = getLeaf(key);
         auto it = std::find(leaf->keys.begin(), leaf->keys.end(), key);
         if (it != leaf->keys.end()) {
-            return leaf->data[std::distance(leaf->keys.begin(), it)];
+            return *(leaf->data[std::distance(leaf->keys.begin(), it)]);
         } else
             return DAT();
     }
@@ -85,7 +85,7 @@ public:
         }
 
         leaf->keys[pos] = key;
-        leaf->data[pos] = data;
+        leaf->data[pos] = new DAT(data);
 
         leaf->keyNumber++;
 
@@ -202,20 +202,38 @@ private:
     }
 
     void print(int deep, Node<KEY, DAT> *node) {
+        std::cout.width(20);
+
+        int last = 0;
+        bool needMargin = false;
+        for (int i = node->keyNumber; i >= 0; i--) {
+            if (node->children[i]) {
+                if (node->children[i]->minKey() < node->keys[node->keyNumber]) {
+                    last = i;
+                    break;
+                }
+                print(deep + 1, node->children[i]);
+                needMargin = true;
+            }
+        }
+        if (needMargin) {
+            std::cout << '\n';
+        }
+
+
         for (int i = 0; i < deep * node->keys.size(); ++i) {
             std::cout << '\t';
         }
 
         if (node->leaf)
             std::cout << " leaf ";
-        std::cout << "  ";
         for (int i = 0; i < node->keyNumber; ++i) {
             std::cout << node->keys[i] << ' ';
         }
         std::cout << "\n";
 
-        bool needMargin = false;
-        for (int i = node->keyNumber; i >= 0; i--) {
+        needMargin = false;
+        for (int i = last; i >= 0; i--) {
             if (node->children[i]) {
                 print(deep + 1, node->children[i]);
                 needMargin = true;

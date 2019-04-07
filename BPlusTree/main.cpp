@@ -25,7 +25,7 @@ void TestINT(int n, int t) {
 }
 
 void TestNEWS(int n, int t) {
-    generateNewsFile(n);
+    //generateNewsFile(n);
     auto news = getNewsFromFile("news.txt");
     BPlusTree<int, News> tree(t);
     for (auto &nw:news) {
