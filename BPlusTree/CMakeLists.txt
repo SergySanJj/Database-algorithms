@@ -3,4 +3,4 @@ project(BPlusTree)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(BPlusTree main.cpp)
+add_executable(BPlusTree main.cpp words.h random.hpp News.h generators.h BPlusTree.h)
