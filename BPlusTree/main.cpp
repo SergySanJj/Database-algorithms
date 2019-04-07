@@ -29,38 +29,39 @@ public:
 
     ~BPlusTree() = default;
 
-    void insert(KEY key, DAT data) {
+    bool insert(KEY key, DAT data) {
+        auto leaf = find_leaf(key);
 
     }
 
     {
         bool insert(T: BPlusTree, key: int, value: Info):
-        leaf = find_key(T, key)
-        if key ∈ leaf
-        return false
+            leaf = find_key(T, key)
+            if key ∈ leaf
+            return false
 
-        // Ищем позицию для нового ключа
-        pos = 0
-        while
-            pos < leaf.key_num and leaf.key[pos] < key
+            // Ищем позицию для нового ключа
+            pos = 0
+            while
+                pos < leaf.key_num and leaf.key[pos] < key
+                        ++
+            pos
+
+            // Вставляем ключ
+            for
+            i = leaf.key_num
+            downto
+            pos + 1
+            leaf.key[i] = leaf.key[i - 1]
+            leaf.pointers[i] = leaf.pointer[i - 1]
+            leaf.key[pos] = key
+            leaf.pointers[pos] = value
                     ++
-        pos
+            leaf.key_num
 
-        // Вставляем ключ
-        for
-        i = leaf.key_num
-        downto
-        pos + 1
-        leaf.key[i] = leaf.key[i - 1]
-        leaf.pointers[i] = leaf.pointer[i - 1]
-        leaf.key[pos] = key
-        leaf.pointers[pos] = value
-                ++
-        leaf.key_num
-
-        if leaf.key_num == 2 * t              // t — степень дерева
-        split(T, leaf)                   // Разбиваем узел
-        return true
+            if leaf.key_num == 2 * t              // t — степень дерева
+            split(T, leaf)                   // Разбиваем узел
+            return true
     }
 private:
     std::size_t t = 2;
