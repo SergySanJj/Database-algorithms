@@ -48,4 +48,10 @@ private:
     int views;
 };
 
+
+std::ostream &operator<<(std::ostream &out, const News &news) {
+    out << news.getTitle();
+    return out;
+}
+
 #endif //ORDERSTATISTICSTREE_NEWS_H

@@ -11,10 +11,10 @@ template<typename KEY, typename DAT>
 class Node {
 public:
     bool leaf;
-    Node<KEY, DAT> *parent;
+    Node<KEY, DAT> *parent = nullptr;
     // brothers:
-    Node<KEY, DAT> *right;
-    Node<KEY, DAT> *left;
+    Node<KEY, DAT> *right = nullptr;
+    Node<KEY, DAT> *left = nullptr;
 
     std::vector<KEY> keys;
     std::vector<DAT> data;
@@ -27,7 +27,7 @@ public:
         keyNumber = 0;
         keys.resize(2 * t);
         data.resize(2 * t);
-        children.resize(20);
+        children.resize(2 * t + 2);
     }
 
     int size() { return keys.size(); }
@@ -38,6 +38,10 @@ public:
                 return true;
         }
         return false;
+    }
+
+    KEY minKey() {
+        return keys[0];
     }
 
 private:
@@ -88,6 +92,24 @@ public:
         if (leaf->keyNumber == 2 * t) {
             split(leaf);
         }
+    }
+
+    void print() {
+        print(0, Root);
+    }
+
+    void sorted() {
+        auto curr = Root;
+        while (!curr->leaf) {
+            curr = curr->children[0];
+        }
+        do {
+            for (auto &el:curr->keys) {
+                std::cout << el << " ";
+            }
+            std::cout << " | ";
+            curr = curr->right;
+        } while (curr->right);
     }
 
 private:
@@ -188,5 +210,29 @@ private:
         }
     }
 
+    void print(int deep, Node<KEY, DAT> *node) {
+        for (int i = 0; i < deep * node->keys.size(); ++i) {
+            std::cout << '\t';
+        }
 
+        if (node->leaf)
+            std::cout << " leaf ";
+        std::cout << "  ";
+        for (int i = 0; i < node->keyNumber; ++i) {
+            std::cout << node->keys[i] << ' ';
+        }
+        std::cout << "\n";
+
+
+        bool needMargin = false;
+        for (int i = node->keyNumber; i >= 0; i--) {
+            if (node->children[i]) {
+                print(deep + 1, node->children[i]);
+                needMargin = true;
+            }
+        }
+        if (needMargin) {
+            std::cout << '\n';
+        }
+    }
 };
