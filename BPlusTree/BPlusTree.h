@@ -120,14 +120,12 @@ private:
     Node<KEY, DAT> *getLeaf(KEY key) {
         auto node = Root;
 
-        while (!node->leaf) {
-            for (int i = 0; i <= node->keyNumber; ++i) {
+        while (!node->leaf)
+            for (int i = 0; i <= node->keyNumber; ++i)
                 if (i == node->keyNumber || key < node->keys[i]) {
                     node = node->children[i];
                     break;
                 }
-            }
-        }
 
         return node;
     }
@@ -143,8 +141,7 @@ private:
         node->right = newNode;
         newNode->left = node;
 
-
-        long middleKey = node->keys[t];
+        int middle = node->keys[t];
         newNode->keyNumber = t - 1;
         node->keyNumber = t;
 
@@ -152,15 +149,13 @@ private:
             newNode->keys[i] = node->keys[i + t + 1];
             newNode->data[i] = node->data[i + t + 1];
             newNode->children[i] = node->children[i + t + 1];
-            if (newNode->children[i]) {
+            if (newNode->children[i])
                 newNode->children[i]->parent = newNode;
-            }
         }
 
         newNode->children[newNode->keyNumber] = node->children[2 * t];
-        if (newNode->children[newNode->keyNumber]) {
+        if (newNode->children[newNode->keyNumber])
             newNode->children[newNode->keyNumber]->parent = newNode;
-        }
 
         if (node->leaf) {
             newNode->keyNumber++;
@@ -176,7 +171,7 @@ private:
 
         if (node == Root) {
             Root = new Node<KEY, DAT>(t);
-            Root->keys[0] = middleKey;
+            Root->keys[0] = middle;
             Root->children[0] = node;
             Root->children[1] = newNode;
             Root->keyNumber = 1;
@@ -188,25 +183,21 @@ private:
 
             int pos = 0;
 
-            while (pos < parent->keyNumber && parent->keys[pos] < middleKey) {
+            while (pos < parent->keyNumber && parent->keys[pos] < middle)
                 pos++;
-            }
 
-            for (int i = parent->keyNumber; i > pos; i--) {
+            for (int i = parent->keyNumber; i > pos; i--)
                 parent->keys[i] = parent->keys[i - 1];
-            }
-            for (int i = parent->keyNumber + 1; i > pos + 1; i--) {
+            for (int i = parent->keyNumber + 1; i > pos + 1; i--)
                 parent->children[i] = parent->children[i - 1];
-            }
 
-            parent->keys[pos] = middleKey;
+            parent->keys[pos] = middle;
             parent->children[pos + 1] = newNode;
 
             parent->keyNumber++;
 
-            if (parent->keyNumber == 2 * t) {
+            if (parent->keyNumber == 2 * t)
                 split(parent);
-            }
         }
     }
 
@@ -222,7 +213,6 @@ private:
             std::cout << node->keys[i] << ' ';
         }
         std::cout << "\n";
-
 
         bool needMargin = false;
         for (int i = node->keyNumber; i >= 0; i--) {
