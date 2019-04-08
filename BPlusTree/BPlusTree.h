@@ -65,6 +65,15 @@ public:
             return DAT();
     }
 
+    bool exists(KEY key) {
+        auto leaf = getLeaf(key);
+        auto it = std::find(leaf->keys.begin(), leaf->keys.end(), key);
+        if (it != leaf->keys.end()) {
+            return true;
+        } else
+            return false;
+    }
+
     void insert(KEY key, DAT data) {
         if (!Root) {
             Root = new Node<KEY, DAT>(t);
@@ -205,7 +214,7 @@ private:
         std::cout.width(20);
 
         int last = 0;
-        bool needMargin = false;
+        bool doLine = false;
         for (int i = node->keyNumber; i >= 0; i--) {
             if (node->children[i]) {
                 if (node->children[i]->minKey() < node->keys[node->keyNumber]) {
@@ -213,10 +222,10 @@ private:
                     break;
                 }
                 print(deep + 1, node->children[i]);
-                needMargin = true;
+                doLine = true;
             }
         }
-        if (needMargin) {
+        if (doLine) {
             std::cout << '\n';
         }
 
@@ -228,18 +237,18 @@ private:
         if (node->leaf)
             std::cout << " leaf ";
         for (int i = 0; i < node->keyNumber; ++i) {
-            std::cout << node->keys[i] << ' ';
+            std::cout << node->keys[i] << " ";
         }
         std::cout << "\n";
 
-        needMargin = false;
+        doLine = false;
         for (int i = last; i >= 0; i--) {
             if (node->children[i]) {
                 print(deep + 1, node->children[i]);
-                needMargin = true;
+                doLine = true;
             }
         }
-        if (needMargin) {
+        if (doLine) {
             std::cout << '\n';
         }
     }

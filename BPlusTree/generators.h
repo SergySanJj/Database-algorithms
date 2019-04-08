@@ -53,9 +53,9 @@ void textualize(std::string &s) {
 }
 
 News createRandomNews() {
-    std::string title = getRandomText(Random::get(3, 10));
+    std::string title = getRandomText(Random::get(2, 4));
     textualize(title);
-    std::string text = getRandomText(Random::get(10, 30));
+    std::string text = getRandomText(Random::get(3, 10));
     textualize(text);
     text[text.size() - 1] = '.';
     int categoryId = Random::get(1, 10);
