@@ -27,6 +27,10 @@ struct BinomialNode {
 
 template<typename T>
 class BinomialHeap {
+private:
+    std::vector<BinomialNode<T> *> mHeap;
+    size_t mSize;
+
 public:
     BinomialHeap();
 
@@ -62,9 +66,6 @@ public:
 
 
 private:
-    std::vector<BinomialNode<T> *> mHeap;
-    size_t mSize;
-
     void print(BinomialNode<T> *root) {
         std::cout << root->mValue << " ";
         auto curr = root;
@@ -73,9 +74,9 @@ private:
         }
 
         if (curr->mChild != nullptr) {
-            std::cout << " -> { ";
+            //std::cout << " -> { ";
             print(curr->mChild);
-            std::cout << " } ";
+            //std::cout << " } ";
         }
     }
 };

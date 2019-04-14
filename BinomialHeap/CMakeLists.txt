@@ -3,4 +3,4 @@ project(BinomialHeap)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(BinomialHeap main.cpp BinomialHeap.h News.h)
+add_executable(BinomialHeap main.cpp BinomialHeap.h News.h FiboHeap.h)
